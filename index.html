@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>3D animation</title>
+    <style type="text/css">
+        #transformation {
+            -webkit-perspective: 800;
+            perspective: 800;
+            margin-left: 500px;
+            overflow: hidden;
+        }
+
+        #transformation iframe {
+            -webkit-transition: -webkit-transform 3s ease-in-out;
+            -webkit-transform: translateZ(-300px);
+            transition: transform 1s ease-in-out;
+            transform: translateZ(-300px);
+        }
+
+        #transformation iframe:hover {
+            -webkit-transform: translateZ(0px);
+            transform: translateZ(0px);
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            background-image: url("1d735ad8eee8350adc96d50e1421ee6d.gif");
+
+            /* Full height */
+            height: 100%;
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        * { color:#fff; text-decoration: none;}
+    </style>
+    <script>
+        var newcomment = {};
+        function open() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/comment", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState != 4 || xhr.status != 200) return;
+
+                // On Success of creating a new Comment
+                console.log("Success: " + xhr.responseText);
+                commentForm.reset();
+            };
+            xhr.send(JSON.stringify(newcomment));
+        }
+        function play() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/play", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState != 4 || xhr.status != 200) return;
+
+                // On Success of creating a new Comment
+                console.log("Success: " + xhr.responseText);
+                commentForm.reset();
+            };
+            xhr.send(JSON.stringify(newcomment));
+        }
+        function smto() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/sendto", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState != 4 || xhr.status != 200) return;
+
+                // On Success of creating a new Comment
+                console.log("Success: " + xhr.responseText);
+                commentForm.reset();
+            };
+            xhr.send(JSON.stringify(newcomment));
+        }
+        function sm() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/send", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState != 4 || xhr.status != 200) return;
+
+                // On Success of creating a new Comment
+                console.log("Success: " + xhr.responseText);
+                commentForm.reset();
+            };
+            xhr.send(JSON.stringify(newcomment));
+        }
+        var textcontent;
+        var TxtType = function(el, toRotate, period) {
+        this.toRotate = toRotate;
+        this.el = el;
+        this.loopNum = 0;
+        this.period = parseInt(period, 10) || 2000;
+        this.txt = '';
+        this.tick();
+        this.isDeleting = false;
+    };
+
+    TxtType.prototype.tick = function() {
+        var i = this.loopNum % this.toRotate.length;
+        var fullTxt = this.toRotate[i];
+
+        if (this.isDeleting) {
+        this.txt = fullTxt.substring(0, this.txt.length - 1);
+        } else {
+        this.txt = fullTxt.substring(0, this.txt.length + 1);
+        }
+
+        this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
+
+        var that = this;
+        var delta = 200 - Math.random() * 100;
+
+        if (this.isDeleting) { delta /= 2; }
+
+        if (!this.isDeleting && this.txt === fullTxt) {
+        delta = this.period;
+        this.isDeleting = true;
+        } else if (this.isDeleting && this.txt === '') {
+        this.isDeleting = false;
+        this.loopNum++;
+        delta = 500;
+        }
+
+        textcontent = setTimeout(function() {
+        that.tick();
+        }, delta);
+    };
+    let str = '["Hii i am Jarvis", "I am Listening..."]';
+    function text() {
+        var elements = document.getElementsByClassName('typewrite');
+        for (var i=0; i<elements.length; i++) {
+            var toRotate = str;
+            var period = elements[i].getAttribute('data-period');
+            console.log(toRotate.length);
+            if (toRotate) {
+              new TxtType(elements[i], JSON.parse(toRotate), period);
+            }
+        }
+        // INJECT CSS
+        var css = document.createElement("style");
+        css.type = "text/css";
+        css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
+        document.body.appendChild(css);
+    };
+        function myFunction() {
+            var artyom = new Artyom();
+            artyom.say("Hello i am jarvis");
+            document.getElementById("iframe1").setAttribute("src", "https://google.com");
+            document.getElementById("iframe1").style.display = "block";
+            artyom.on(['Good morning', 'Good afternoon']).then((i) => {
+                switch (i) {
+                    case 0:
+                        artyom.say("Good morning, how are you?");
+                        break;
+                    case 1:
+                        artyom.say("Good afternoon, how are you?");
+                        break;
+                }
+
+            });
+            artyom.on(['repeat after me *'], true).then((i, wildcard) => {
+                artyom.say("You've said : " + wildcard);
+            });
+            artyom.on(['play *'], true).then((i, wildcard) => {
+                clearTimeout(textcontent);
+                            str = '["Playing ' + wildcard +'..."]';
+                        text();
+                artyom.say("Playing " + wildcard);
+                newcomment.song = wildcard;
+                play();
+            });
+            artyom.on(['message to *'], true).then((i, wildcard) => {
+                clearTimeout(textcontent);
+                            str = '["What message you want to send to ' + wildcard +'..."]';
+                        text();
+                artyom.say("What message you want to send to " + wildcard);
+                newcomment.username = wildcard;
+                smto();
+                setTimeout(() => {
+                    clearTimeout(textcontent);
+                            str = '["Sending message to ' + wildcard +'..."]';
+                        text();
+                }, 6000);
+            });
+            artyom.on(['send *'], true).then((i, wildcard) => {
+                artyom.say("Sending message");
+                newcomment.msg = wildcard;
+                sm();
+            });
+            artyom.on(['open *'], true).then((i, wildcard) => {
+                clearTimeout(textcontent);
+                        document.getElementById("iframe1").setAttribute("src", "https://google.com");
+                        str = '["Opening ' + wildcard +'..."]';
+                        text();
+                        newcomment.name = wildcard;
+                artyom.say("Opening " + wildcard);
+                setTimeout(() => {
+                            open();
+                        }, 1000);
+                if(wildcard == "web whatsapp"){
+                    setTimeout(() => {
+                            clearTimeout(textcontent);
+                            str = '["Scan QR code to login..."]';
+                        text();
+                        artyom.say("Scan QR code to login");
+                        }, 6000);
+                        setTimeout(() => {
+                            clearTimeout(textcontent);
+                            str = '["Hii i am Jarvis", "I am Listening..."]';
+                        text();
+                        }, 12000);
+                }else{
+                        setTimeout(() => {
+                            clearTimeout(textcontent);
+                            str = '["Hii i am Jarvis", "I am Listening..."]';
+                        text();
+                        }, 6000);}
+            });
+            artyom.addCommands([
+                {
+                    indexes: ['Hello', 'Hi', 'is someone there'],
+                    action: (i) => {
+                        artyom.say("Hello, it's me");
+                    }
+                },
+                {
+                    indexes: ['shutdown yourself'],
+                    action: (i, wildcard) => {
+                        artyom.fatality().then(() => {
+                            console.log("Artyom succesfully stopped");
+                        });
+                    }
+                }
+            ]);
+            artyom.initialize({
+                lang: "en-US", // GreatBritain english
+                continuous: true, // Listen forever
+                soundex: true,// Use the soundex algorithm to increase accuracy
+                debug: true, // Show messages in the console
+                executionKeyword: "and do it now",
+                listen: true, // Start to listen commands !
+
+                // If providen, you can only trigger a command if you say its name
+                // e.g to trigger Good Morning, you need to say "Jarvis Good Morning"
+            }).then(() => {
+                console.log("Artyom has been succesfully initialized");
+            }).catch((err) => {
+                console.error("Artyom couldn't be initialized: ", err);
+            });
+
+        }
+        
+
+    </script>
+</head>
+
+<body onload="text()">
+    <!-- <button onclick="myFunction()" id="jarvis" style="visibility: hidden;">Click me</button> -->
+    <h1 style="float: right; margin-right: 100px; margin-top: 100px;">
+        <p class="typewrite" data-period="2000"
+            data-type='[ "Hi, Im Si.", "I am Creative.", "I Love Design.", "I Love to Develop." ]'>
+            <span class="wrap"></span>
+        </p>
+    </h1>
+    <img src="tenor.gif" onclick="myFunction()" id="jarvis">
+    <script src="artyom.window.js"></script>
+    <script src="iframe.js"></script>
+    <div id="transformation" style="height: 400px; width: 600px;">
+        <iframe id="iframe1" src="" style="display: none;" height=418px width=618px></iframe>
+    </div>
+</body>
+
+</html>
